@@ -1671,6 +1671,47 @@
       };
       input.click();
     }
+<div class="export-section">
+  <h3>สรุปรายงานผลรายวิชา</h3>
+  
+  <label for="reportClass">ชั้นเรียน:</label>
+  <select id="reportClass">
+    <option value="">-- เลือกชั้นเรียน --</option>
+  </select>
+
+  <label for="reportSubject">รายวิชา:</label>
+  <select id="reportSubject">
+    <option value="">-- เลือกรายวิชา --</option>
+  </select>
+
+  <button onclick="exportReport('pdf')">Export PDF</button>
+  <button onclick="exportReport('word')">Export Word</button>
+</div>
+
+function exportReport(type) {
+  const classId = document.getElementById('reportClass').value;
+  const subjectId = document.getElementById('reportSubject').value;
+
+  if (!classId || !subjectId) {
+    alert('กรุณาเลือกชั้นเรียนและรายวิชาก่อน');
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(function(response) {
+      if (response.success) {
+        window.open(response.downloadUrl, '_blank');
+      } else {
+        alert('เกิดข้อผิดพลาด: ' + response.message);
+      }
+    })
+    .withFailureHandler(function(error) {
+      alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้: ' + error.message);
+    })
+    .exportReport({ type: type, classId: classId, subjectId: subjectId });
+}
+
+
 
     // ==================== START ====================
     document.addEventListener('DOMContentLoaded', initApp);
